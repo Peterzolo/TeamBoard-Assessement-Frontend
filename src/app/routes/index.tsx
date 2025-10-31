@@ -39,6 +39,15 @@ const CreateTeam = lazy(
 const CreateProject = lazy(
   () => import("../../screens/DashboardScreens/Projects/CreateProject")
 );
+const TaskList = lazy(
+  () => import("../../screens/DashboardScreens/Tasks/TaskList")
+);
+const TaskDetails = lazy(
+  () => import("../../screens/DashboardScreens/Tasks/TaskDetails")
+);
+const CreateTask = lazy(
+  () => import("../../screens/DashboardScreens/Tasks/CreateTask")
+);
 
 export const router = createBrowserRouter([
   { path: "/", element: <LoginPage /> },
@@ -60,6 +69,9 @@ export const router = createBrowserRouter([
       { path: "project/list", element: <ProjectList /> },
       { path: "project/create", element: <CreateProject /> },
       { path: "project/:id", element: <ProjectDetails /> },
+      { path: "task/list", element: <TaskList /> },
+      { path: "task/create", element: <CreateTask /> },
+      { path: "task/:id", element: <TaskDetails /> },
     ],
   },
 

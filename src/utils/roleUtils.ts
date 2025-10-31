@@ -1,4 +1,5 @@
-import { IUser, UserRoleAccess } from "@/app/redux/types/auth";
+import type { IUser } from "../app/redux/types/user";
+import { UserRoleAccess } from "../app/redux/types/auth";
 
 /**
  * Helper function to check if a role is an admin role

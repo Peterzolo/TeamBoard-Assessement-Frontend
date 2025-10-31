@@ -1,6 +1,5 @@
-import React, { useState, forwardRef, ForwardedRef } from "react";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import React, { useState, forwardRef, type ForwardedRef } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 interface TextInputProps {
   type?: "text" | "password" | "number" | "tel";
@@ -89,9 +88,9 @@ export const TextInput = forwardRef(
             disabled={disabled}
           >
             {showPassword ? (
-              <VisibilityOffOutlinedIcon />
+              <AiOutlineEyeInvisible className="w-5 h-5" />
             ) : (
-              <VisibilityOutlinedIcon />
+              <AiOutlineEye className="w-5 h-5" />
             )}
           </button>
         )}

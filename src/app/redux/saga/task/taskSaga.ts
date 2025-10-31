@@ -217,13 +217,13 @@ export function* assignTaskMemberSaga(
     const { taskId, memberId } = action.payload;
     console.log("ASSIGN TASK MEMBER SAGA", { taskId, memberId });
 
-    const url = `/tasks/${taskId}/assign`;
+    const url = `/tasks/${taskId}/assignees`;
 
     const config = {
       method: "POST",
       url,
       credentials: "include",
-      data: { memberId },
+      data: { assignees: [memberId] },
     };
 
     const response = yield call(request, config);
@@ -254,12 +254,13 @@ export function* unassignTaskMemberSaga(
     const { taskId, memberId } = action.payload;
     console.log("UNASSIGN TASK MEMBER SAGA", { taskId, memberId });
 
-    const url = `/tasks/${taskId}/unassign/${memberId}`;
+    const url = `/tasks/${taskId}/assignees`;
 
     const config = {
       method: "DELETE",
       url,
       credentials: "include",
+      data: { assignees: [memberId] },
     };
 
     const response = yield call(request, config);
@@ -293,7 +294,7 @@ export function* updateTaskPrioritySaga(
     const url = `/tasks/${taskId}/priority`;
 
     const config = {
-      method: "PATCH",
+      method: "POST",
       url,
       credentials: "include",
       data: { priority },
@@ -330,7 +331,7 @@ export function* updateTaskStatusSaga(
     const url = `/tasks/${taskId}/status`;
 
     const config = {
-      method: "PATCH",
+      method: "POST",
       url,
       credentials: "include",
       data: { status },
@@ -364,7 +365,7 @@ export function* reviewTaskSaga(
     const { taskId, review } = action.payload;
     console.log("REVIEW TASK SAGA", { taskId, review });
 
-    const url = `/tasks/${taskId}/review`;
+    const url = `/tasks/${taskId}/reviews`;
 
     const config = {
       method: "POST",

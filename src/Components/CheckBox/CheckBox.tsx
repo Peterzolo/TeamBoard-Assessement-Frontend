@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import React from "react";
 
 interface CheckBoxProps {
@@ -32,7 +32,7 @@ const CheckBox: React.FC<CheckBoxProps> = ({
         <span className="mr-2">{label}</span>
         {termsLink && (
           <Link
-            href={termsLink}
+            to={termsLink}
             className="text-blue-500 hover:underline"
             style={{ textDecoration: "none" }}
           >

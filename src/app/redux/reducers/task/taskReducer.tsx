@@ -70,7 +70,7 @@ const taskSlice = createSlice({
     setAllTasksSuccess: (state, action: PayloadAction<any>) => {
       state.fetchAllTasksLoading = false;
       state.allTasks = action.payload.data || [];
-      state.allTaskCount = action.payload.total || 0;
+      state.allTaskCount = action.payload.meta?.total || action.payload.total || 0;
       state.fetchAllTasksError = null;
     },
     setAllTasksFailure: (state, action: PayloadAction<string>) => {

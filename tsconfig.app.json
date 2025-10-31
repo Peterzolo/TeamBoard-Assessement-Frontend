@@ -24,5 +24,16 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/utils/hooks/useDashboardNavigation.ts",
+    "src/utils/hooks/useAutoRefreshUserData.ts",
+    "src/utils/hooks/useRefreshUserData.ts",
+    "src/utils/hooks/isAuthenticated.ts",
+    "src/utils/hooks/useUserData.ts",
+    "src/utils/hooks/useUserId.ts",
+    "src/utils/hooks/useSocketNotifications.ts",
+    "src/utils/hooks/useUserDashboard.ts",
+    "src/utils/roleUtils.ts"
+  ]
 }

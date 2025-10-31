@@ -8,6 +8,7 @@ import {
   FolderKanban,
   UsersRound,
   Plus,
+  CheckSquare,
 } from "lucide-react";
 
 interface SidebarItem {
@@ -67,6 +68,22 @@ const sidebarItems: SidebarItem[] = [
       {
         name: "Create Project",
         path: "/dashboard/project/create",
+        icon: <Plus size={16} />,
+      },
+    ],
+  },
+  {
+    name: "Tasks",
+    icon: <CheckSquare size={18} />,
+    children: [
+      {
+        name: "All Tasks",
+        path: "/dashboard/task/list",
+        icon: <CheckSquare size={16} />,
+      },
+      {
+        name: "Create Task",
+        path: "/dashboard/task/create",
         icon: <Plus size={16} />,
       },
     ],

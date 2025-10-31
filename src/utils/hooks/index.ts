@@ -52,5 +52,6 @@
  * - Automatic synchronization with server
  */
 
-export { useRefreshUserData } from './useRefreshUserData';
-export { useAutoRefreshUserData } from './useAutoRefreshUserData';
+// Commented out legacy hooks that are not used in the React Router application
+// export { useRefreshUserData } from './useRefreshUserData';
+// export { useAutoRefreshUserData } from './useAutoRefreshUserData';

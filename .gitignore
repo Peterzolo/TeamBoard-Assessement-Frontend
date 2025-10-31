@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Documentation files
+*.txt
+*.md
+*.doc
+*.docx
+docs/
+documentation/

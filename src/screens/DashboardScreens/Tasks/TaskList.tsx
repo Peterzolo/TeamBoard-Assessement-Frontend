@@ -29,7 +29,11 @@ import {
 } from "../../../app/redux/reducers/task/selectors/taskSelectors";
 import { setAllTasksStart } from "../../../app/redux/reducers/task/taskReducer";
 import type { ITaskQueryFilter } from "../../../app/redux/types/task";
-import type { ITask, TaskStatus, TaskPriority } from "../../../app/redux/types/task";
+import type {
+  ITask,
+  TaskStatus,
+  TaskPriority,
+} from "../../../app/redux/types/task";
 import { BackButton } from "../../../Components/BackButton/BackButton";
 import { allProjectsSelector } from "../../../app/redux/reducers/project/selectors/projectSelectors";
 import { setAllProjectsStart } from "../../../app/redux/reducers/project/projectReducer";
@@ -44,8 +48,11 @@ type ExtendedTask = ITask & {
   updatedAt?: string | Date;
   _id?: string;
   dueDate?: string | Date;
+  project?: IProject | string; // Handle project as string ID from API
   assignees?: IUser[] | string[];
-  createdBy?: string | { _id?: string; id?: string; firstName?: string; lastName?: string };
+  createdBy?:
+    | string
+    | { _id?: string; id?: string; firstName?: string; lastName?: string };
 };
 
 type ExtendedProject = IProject & {
@@ -72,7 +79,14 @@ const TaskList = () => {
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<ITaskQueryFilter & { sortBy?: string; sortOrder?: "asc" | "desc" }>({
+  const [filters, setFilters] = useState<
+    Omit<ITaskQueryFilter, "project" | "assignee"> & {
+      project?: string;
+      assignee?: string;
+      sortBy?: string;
+      sortOrder?: "asc" | "desc";
+    }
+  >({
     page: 1,
     limit: 10,
     sortBy: "createdAt",
@@ -105,8 +119,8 @@ const TaskList = () => {
       page: filters.page,
       limit: filters.limit,
       search: debouncedSearchTerm,
-      project: filters.project,
-      assignee: filters.assignee,
+      project: filters.project ? (filters.project as any) : undefined,
+      assignee: filters.assignee ? (filters.assignee as any) : undefined,
       status: filters.status,
       priority: filters.priority,
       isActive: filters.isActive,
@@ -129,7 +143,16 @@ const TaskList = () => {
     setRetryFetch((prev) => !prev);
   };
 
-  const handleFilterChange = (newFilters: Partial<ITaskQueryFilter & { sortBy?: string; sortOrder?: "asc" | "desc" }>) => {
+  const handleFilterChange = (
+    newFilters: Partial<
+      Omit<ITaskQueryFilter, "project" | "assignee"> & {
+        project?: string;
+        assignee?: string;
+        sortBy?: string;
+        sortOrder?: "asc" | "desc";
+      }
+    >
+  ) => {
     setFilters((prev) => {
       const updated = {
         ...prev,
@@ -178,39 +201,51 @@ const TaskList = () => {
 
   const getAssigneeNames = (task: ExtendedTask): string => {
     if (!task.assignees || task.assignees.length === 0) return "Unassigned";
-    
+
     if (Array.isArray(task.assignees) && task.assignees.length > 0) {
       if (typeof task.assignees[0] === "string") {
         // If assignees are IDs, try to find users
-        const names = task.assignees
-          .map((id) => {
-            const user = allUsers.find((u: ExtendedUser) => u.id === id || u._id === id);
+        const assigneeIds = task.assignees as string[];
+        const names = assigneeIds
+          .map((assigneeId: string) => {
+            const user = allUsers.find(
+              (u: ExtendedUser) => u.id === assigneeId || u._id === assigneeId
+            );
             return user ? `${user.firstName} ${user.lastName}` : "";
           })
           .filter(Boolean);
         return names.length > 0 ? names.join(", ") : "Unassigned";
       } else {
         // If assignees are user objects
-        const names = task.assignees.map((user: any) => `${user.firstName} ${user.lastName}`);
+        const assigneeUsers = task.assignees as IUser[];
+        const names = assigneeUsers.map(
+          (user: IUser) => `${user.firstName} ${user.lastName}`
+        );
         return names.join(", ");
       }
     }
-    
+
     return "Unassigned";
   };
 
   const getProjectName = (task: ExtendedTask): string => {
     if (!task.project) return "N/A";
-    
+
     if (typeof task.project === "string") {
-      const project = allProjects.find((p: ExtendedProject) => p._id === task.project || p.id === task.project);
+      const project = allProjects.find(
+        (p: ExtendedProject) => p._id === task.project || p._id === task.project
+      );
       return project ? project.name : task.project;
     }
-    
-    if (task.project && typeof task.project === "object" && "name" in task.project) {
+
+    if (
+      task.project &&
+      typeof task.project === "object" &&
+      "name" in task.project
+    ) {
       return task.project.name;
     }
-    
+
     return "N/A";
   };
 
@@ -242,9 +277,7 @@ const TaskList = () => {
       label: "Project",
       sortable: false,
       render: (_: any, task: ExtendedTask) => (
-        <div className="text-sm text-gray-900">
-          {getProjectName(task)}
-        </div>
+        <div className="text-sm text-gray-900">{getProjectName(task)}</div>
       ),
     },
     {
@@ -252,9 +285,7 @@ const TaskList = () => {
       label: "Assignees",
       sortable: false,
       render: (_: any, task: ExtendedTask) => (
-        <div className="text-sm text-gray-900">
-          {getAssigneeNames(task)}
-        </div>
+        <div className="text-sm text-gray-900">{getAssigneeNames(task)}</div>
       ),
     },
     {
@@ -263,7 +294,9 @@ const TaskList = () => {
       sortable: false,
       render: (value: any) => (
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(value)}`}
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+            value
+          )}`}
         >
           {value || "N/A"}
         </span>
@@ -275,7 +308,9 @@ const TaskList = () => {
       sortable: false,
       render: (value: any) => (
         <span
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(value)}`}
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(
+            value
+          )}`}
         >
           {value || "N/A"}
         </span>
@@ -328,7 +363,12 @@ const TaskList = () => {
   ];
 
   const hasActiveFilters =
-    filters.project || filters.assignee || filters.status || filters.priority || filters.isActive !== undefined || searchTerm;
+    filters.project ||
+    filters.assignee ||
+    filters.status ||
+    filters.priority ||
+    filters.isActive !== undefined ||
+    searchTerm;
 
   if (dataLoading) {
     return (
@@ -502,11 +542,7 @@ const TaskList = () => {
                       <div>
                         <SelectInput
                           options={projectOptions}
-                          value={
-                            typeof filters.project === "string"
-                              ? filters.project
-                              : (filters.project as ExtendedProject)?._id || ""
-                          }
+                          value={filters.project || ""}
                           onChange={(value) =>
                             handleFilterChange({ project: value || undefined })
                           }
@@ -521,11 +557,7 @@ const TaskList = () => {
                       <div>
                         <SelectInput
                           options={assigneeOptions}
-                          value={
-                            typeof filters.assignee === "string"
-                              ? filters.assignee
-                              : (filters.assignee as ExtendedUser)?.id || (filters.assignee as ExtendedUser)?._id || ""
-                          }
+                          value={filters.assignee || ""}
                           onChange={(value) =>
                             handleFilterChange({ assignee: value || undefined })
                           }
@@ -542,7 +574,9 @@ const TaskList = () => {
                           options={statusOptions}
                           value={filters.status || ""}
                           onChange={(value) =>
-                            handleFilterChange({ status: value as TaskStatus || undefined })
+                            handleFilterChange({
+                              status: (value as TaskStatus) || undefined,
+                            })
                           }
                           placeholder="Select Status"
                           label="Status"
@@ -557,7 +591,9 @@ const TaskList = () => {
                           options={priorityOptions}
                           value={filters.priority || ""}
                           onChange={(value) =>
-                            handleFilterChange({ priority: value as TaskPriority || undefined })
+                            handleFilterChange({
+                              priority: (value as TaskPriority) || undefined,
+                            })
                           }
                           placeholder="Select Priority"
                           label="Priority"
@@ -617,9 +653,7 @@ const TaskList = () => {
             {/* Pagination */}
             <div className="bg-gray-50 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-t border-gray-200">
               <CustomPagination
-                count={Math.ceil(
-                  totalItems / (filters.limit || 10)
-                )}
+                count={Math.ceil(totalItems / (filters.limit || 10))}
                 page={Number(filters.page || 1)}
                 pageSize={filters.limit || 10}
                 onPageChange={handlePageChange}
@@ -634,4 +668,3 @@ const TaskList = () => {
 };
 
 export default TaskList;
-
